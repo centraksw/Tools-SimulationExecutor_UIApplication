@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
  
 // Set up the Redis client for subscribing to a channel
 const redisRes = redis.createClient({
-    host: '192.168.0.104',
+    host: '192.168.0.132',
     port: 6379
 });
  
@@ -63,7 +63,7 @@ redisRes.on('message', (message) => {
 });
  
 // Subscribe to a channel named 'my_channel'
-redisRes.subscribe('TEST', (message, count) => {
+redisRes.subscribe('ServerLiveData', (message, count) => {
     if (message) {
          redisRes.emit('message', message);
     } 
@@ -72,21 +72,6 @@ redisRes.subscribe('TEST', (message, count) => {
     }
 });
 
-io.on('connection', (socket) => {
-    console.log('New client connected');
-    socket.on('disconnect', () => {
-      console.log('Client disconnected');
-    });
-});
-
-app.post('/publish', async (req, res) => {
-    const { channel, message } = req.body;
-    await publisher.connect();
-    await publisher.publish(channel, message);
-    console.log("Channel: " + channel + "Message: " + message);
-    res.send('Message published');
-  });
- 
 // Start the HTTP server
 server.listen(3000, function () {
     console.log('Server is running on port 3000');
