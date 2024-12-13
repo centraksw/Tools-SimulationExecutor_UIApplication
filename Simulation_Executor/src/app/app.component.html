@@ -1,0 +1,117 @@
+<main class="main">
+
+  <!-- Logo styles -->
+  <div class="logo">
+    <img src="/assets/centrak.svg" title="Simulator" style="margin-left: 10px;">
+  </div>
+
+  <div class="button-status-container">
+    <h3>
+      <span class="status-label">Socket Connection Status: </span> <!-- span for Dynamic display -->
+      <span [ngClass]="{
+          'connected-style': connectionStatus === 'Connected.',
+          'disconnected-style': connectionStatus === 'Disconnected.',
+          'reconnecting-style': connectionStatus === 'Reconnecting.....'
+        }">
+        {{ connectionStatus }}
+      </span>
+    </h3>
+  </div>
+
+  <!-- filter  -->
+
+  <div class="filter-flex-container">
+      
+    <div class="filter-text-box">  
+      <input   id="filter-id" type="text" (keydown)="onKeyDown($event)" [(ngModel)]="filterTagId" placeholder="Enter TagId  seperated by comma to filter" style="width: 500px;"/>
+
+    </div>
+
+    <div class="filter-button-column">
+     
+      <button type="button" class="button-style" [disabled]="isFilterApplied" (click)="applyFilter()">
+        {{FilterStatusString}}
+      </button>
+
+      <button type="button" class="button-style" (click)="clearFilter()">
+        Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- table related button -->
+
+  <div class="table-button-container">
+
+    <button type="button" class="button-style table-button" (click)="OnExportCSV()">
+      Export
+    </button>
+
+    <button type="button" class="button-style table-button" (click)="OnListViewClear()">
+      ListView Clear
+    </button>
+
+    <label>
+      <input type="checkbox" class="cls-autoscroll" [(ngModel)]="isChecked" (change)="toggleAutoScroll($event)">
+      Auto Scroll
+    </label>
+
+  </div>
+
+  <!-- Table  -->
+
+  <div #tableContainer class="scroll-container table-container">
+    <table>
+      <thead class="table-header-view">
+        <tr>
+          <th>Tag ID</th>
+          <th>UpdatedOn</th>
+          <th>Tag Type</th>
+          <th>Command</th>
+          <th>RSSI</th>
+          <th>Keys</th>
+          <th>Monitor ID</th>
+          <th>Floor ID</th>
+          <th>Campus Name</th>
+          <th>Building Name</th>
+          <th>Floor Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="table-row-view" *ngFor="let item of isFilterApplied ? Filteredquotes : Responsequotes">
+          <td>{{ item.tagId }}</td>
+          <td>{{ item.time }}</td>
+          <td>{{ item.tagType }}</td>
+          <td>{{ item.command }}</td>
+          <td>{{ item.rssi }}</td>
+          <td>{{ item.flkeys }}</td>
+          <td>{{ item.monitorRFId }}</td>
+          <td>{{ item.floorId }}</td>
+          <td>{{ item.campus }}</td>
+          <td>{{ item.building }}</td>
+          <td>{{ item.floor }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="EmptyFilter" class="message-box">
+    <div class="message-content">
+      <span class="message-text">{{ EmptyFilter }}</span>
+      <div>
+        <button class="close-button" (click)="closeMessageBox()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+
+  <div class="footer">
+    <p class="mat-caption">
+      <span>&copy; {{ currentYear }} CenTrak, Inc.</span>
+      <span>All rights reserved.</span>
+    </p>
+  </div>
+</main>
+
+<router-outlet />

@@ -1,0 +1,278 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif, Verdana, Arial;
+}
+
+
+/*Centrak logo*/
+.h3 {
+  font-family: sans-serif, Verdana, Arial;
+
+}
+
+.logo {
+  height: 48px;
+  line-height: 48px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #005592;
+}
+
+/* common form styles*/
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-column-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 250px 250px;
+}
+
+.label-style {
+  margin-right: 4px;
+}
+
+.button-style {
+
+  font-size: 14px !important;
+  width: 7.5rem;
+  height: 2.5em;
+  background-color: #037eea;
+  color: #ffffff !important;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  font-family: Segoe UI;
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.5) inset;
+
+}
+
+
+button:hover {
+  background-color: #005592;
+}
+
+.mat-dialog-actions {
+  justify-content: space-between;
+}
+
+/*From style*/
+
+.button-status-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* Redis status */
+.status-label {
+  color: black;
+  margin-left: 5px;
+
+}
+
+.button-alighn {
+  margin: 10px;
+
+}
+
+.connected-style {
+  color: green !important;
+}
+
+.disconnected-style {
+  color: red !important;
+}
+
+.reconnecting-style {
+  color: orange !important;
+}
+
+/*Filter styles */
+
+.filter-flex-container {
+  display: flex;
+  /* grid-template-columns: auto 1fr;two col */
+  flex-direction: row;
+  gap: 20px;
+  width: 820px;
+  border: 1px solid black;
+  /*for border on filter container*/
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.filter-text-box {
+  display: flex;
+  /*just for center alighn*/
+  align-items: stretch;
+  margin: 0px;
+  padding: 0px;
+}
+
+.filter-button-column {
+  display: flex;
+  /*just for center alighn*/
+  justify-content: center;
+  gap: 10px;
+}
+
+.button-style:disabled {
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+/* Auto scroll */
+
+.scroll-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+  overflow-y: auto;
+  /* Enables vertical scrolling */
+}
+
+.cls-autoscroll {
+  margin-top: 40px;
+  margin-bottom: 10px;
+
+}
+
+/*table button styles*/
+
+.table-button-container {
+  display: flex;
+  flex-direction: row;
+  padding-left: 1200px;
+  gap: 10px;
+}
+
+.table-button {
+  margin-top: 20px;
+  border: none;
+
+}
+
+/*table styles*/
+
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px;
+  word-wrap: break-word;
+  /*if campus building name is large it will in next line*/
+}
+
+ .table-container {    
+    border:2px solid #005592 ;  
+    height: 800px;
+    width: 1600px;
+    padding-top: 0px;
+    padding-left: 0px;
+  }
+
+
+.table-header-view {
+  margin-top: 0px;  
+  background-image: linear-gradient(to bottom, #0b68aa, #036fbd);    
+  padding :5px;
+  font-family:  sans-serif,Verdana, Arial;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  color: #f5f5f5;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 10;
+}
+
+.table-row-view {
+  background-color: #f5f5f5;
+  font-family: sans-serif, Verdana, Arial;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  color: #282626;
+
+}
+
+/*Table Message box*/
+
+.message-box {
+  position: absolute;
+  top: 50%;
+  /*to be at center*/
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgb(71, 177, 252);
+  border-width: 5px;
+  background-color: whitesmoke;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  z-index: 800;
+  /* Make sure it stays on top of the table */
+  text-align: center;
+  width: 260px;
+  font-size: 18px;
+  height: 60px;
+}
+
+.close-button {
+  display: flex;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid black;
+  border-radius: 8px;
+  color: black;
+  font-size: 15px;
+  cursor: pointer;
+  margin: 20px;
+  margin-left: 7em;
+  ;
+  transition: background-color 0.3s;
+  top: 10px;
+  /* Adjust the position from the top */
+  right: 10px;
+  /* Adjust the position from the right */
+}
+
+.close-button:hover {
+  background-color: white;
+  border-radius: 8px;
+}
+
+/*footer styles*/
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #005592;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+th{
+  width:100px;
+}
