@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceDataSimulatorService", "DeviceDataSimulatorService.csproj", "{C32E8881-BD45-41BC-863F-0725BE54091C}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DeviceDataSimulatorSetup", "..\DeviceDataSimulatorSetup\DeviceDataSimulatorSetup.vdproj", "{5B4852C4-364A-484E-974E-9AE14C79E5D7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C32E8881-BD45-41BC-863F-0725BE54091C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C32E8881-BD45-41BC-863F-0725BE54091C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C32E8881-BD45-41BC-863F-0725BE54091C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C32E8881-BD45-41BC-863F-0725BE54091C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B4852C4-364A-484E-974E-9AE14C79E5D7}.Debug|Any CPU.ActiveCfg = Debug
+		{5B4852C4-364A-484E-974E-9AE14C79E5D7}.Release|Any CPU.ActiveCfg = Release
+		{5B4852C4-364A-484E-974E-9AE14C79E5D7}.Release|Any CPU.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7F251EA1-8D1A-4870-9032-6717D17941D5}
+	EndGlobalSection
+EndGlobal
