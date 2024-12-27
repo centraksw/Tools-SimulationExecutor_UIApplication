@@ -21,16 +21,17 @@
   <!-- filter  -->
 
   <div class="filter-flex-container">
-      
-    <div class="filter-text-box">  
-      <input   id="filter-id" type="text" (keydown)="onKeyDown($event)" [(ngModel)]="filterTagId" placeholder="Enter TagId  seperated by comma to filter" style="width: 500px;"/>
+
+    <div class="filter-text-box">
+      <input id="filter-id" type="text" (keydown)="onKeyDown($event)" [(ngModel)]="filterTagId"
+        placeholder="Enter TagId  seperated by comma to filter" style="width: 500px;" />
 
     </div>
 
     <div class="filter-button-column">
      
-      <button type="button" class="button-style" [disabled]="isFilterApplied" (click)="applyFilter()">
-        {{FilterStatusString}}
+      <button type="button" class="button-style" (click)="applyFilter()">
+        Filter
       </button>
 
       <button type="button" class="button-style" (click)="clearFilter()">
@@ -52,7 +53,7 @@
     </button>
 
     <label>
-      <input type="checkbox" class="cls-autoscroll" [(ngModel)]="isChecked" (change)="toggleAutoScroll($event)">
+      <input type="checkbox" class="cls-autoscroll" (change)="toggleAutoScroll($event)"> 
       Auto Scroll
     </label>
 
@@ -66,27 +67,32 @@
         <tr>
           <th>Tag ID</th>
           <th>UpdatedOn</th>
+          <th>Packet Time</th>
           <th>Tag Type</th>
-          <th>Command</th>
+          <th>Star Id</th>
+          <th>Room Id</th>
           <th>RSSI</th>
           <th>Keys</th>
-          <th>Monitor ID</th>
-          <th>Floor ID</th>
+          <th>X</th>
+          <th>Y</th>
           <th>Campus Name</th>
           <th>Building Name</th>
           <th>Floor Name</th>
+         
         </tr>
       </thead>
       <tbody>
         <tr class="table-row-view" *ngFor="let item of isFilterApplied ? Filteredquotes : Responsequotes">
           <td>{{ item.tagId }}</td>
-          <td>{{ item.time }}</td>
+          <td>{{ item.time | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+          <td>{{ item.packetTime | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
           <td>{{ item.tagType }}</td>
-          <td>{{ item.command }}</td>
+          <td>{{ item.starId }}</td>
+          <td>{{ item.roomId }}</td>
           <td>{{ item.rssi }}</td>
-          <td>{{ item.flkeys }}</td>
-          <td>{{ item.monitorRFId }}</td>
-          <td>{{ item.floorId }}</td>
+          <td>{{ item.keys }}</td>
+          <td>{{ item.x }}</td>
+          <td>{{ item.y }}</td>
           <td>{{ item.campus }}</td>
           <td>{{ item.building }}</td>
           <td>{{ item.floor }}</td>
@@ -94,14 +100,14 @@
       </tbody>
     </table>
   </div>
+  
+  <!-- Filter Message Box -->
+  
+  <div *ngIf="WarningMsg" class="message-box">   
+     
+      <span class="message-text">{{ WarningMsg }}</span>
 
-  <div *ngIf="EmptyFilter" class="message-box">
-    <div class="message-content">
-      <span class="message-text">{{ EmptyFilter }}</span>
-      <div>
-        <button class="close-button" (click)="closeMessageBox()">Close</button>
-      </div>
-    </div>
+      <button class="close-button" (click)="CloseWarningMsg()" >Close</button>    
   </div>
 
   <!-- Footer -->

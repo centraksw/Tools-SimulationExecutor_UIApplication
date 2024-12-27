@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatDialogActions } from '@angular/material/dialog';
 import { HttpClient, HttpClientModule, HttpHandler } from '@angular/common/http';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,7 @@ import { HttpClient, HttpClientModule, HttpHandler } from '@angular/common/http'
     MatDialogActions
   ],
   providers: [
-    provideClientHydration()
+    provideClientHydration(),[DatePipe]
   ],
   bootstrap: [AppComponent],
   

@@ -2,20 +2,23 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChi
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { FormBuilder, FormControl } from "@angular/forms";
 import { SimulationDataService } from './simulation-data.service';
-import { Subscription } from 'rxjs';
-
+import { Subscription, filter } from 'rxjs';
+import { DatePipe } from '@angular/common';
 
 interface Quote {
   tagId: string;
   time: string;
+  tagType: string;
+  starId: number;
+  roomId: number;
+  rssi: number;
+  keys: number;
+  x: number;
+  y: number;
   campus: string;
   building: string;
   floor: string;
-  x: number;
-  y: number;
-  starId: string;
-  roomId: string;
-  keys: string;
+  packetTime: Date;
 }
 
 @Component({
@@ -35,7 +38,7 @@ export class AppComponent implements OnInit {
   Responsequotes: any[] = [];
   Filteredquotes: any[] = [];
   connectionStatus: string = 'Disconnected.';
-  EmptyFilter: string = '';
+  WarningMsg: string =  '';  
   filterTagId: string = '';
   isFilterApplied: boolean = false;
   isAutoScrollEnabled: boolean = false;
@@ -43,12 +46,14 @@ export class AppComponent implements OnInit {
   currentYear = new Date().getFullYear()
   @ViewChild('tableContainer', { static: false }) tableContainer!: ElementRef;
 
-  FilterStatusString: string =  'Filter';  
+  FilterStatusString: string = 'Filter';
   control = new FormControl();
   sub!: Subscription;
   stockQuote!: any;
+  filterTags: string[] = []; 
+  private intervalId: any;
 
-  constructor(public fb: FormBuilder, private dataService: SimulationDataService, private cdr: ChangeDetectorRef) { }
+  constructor(public fb: FormBuilder, private dataService: SimulationDataService, private cdr: ChangeDetectorRef, private datePipe: DatePipe) { }
 
   ngOnInit() {
 
@@ -61,79 +66,88 @@ export class AppComponent implements OnInit {
 
     /*subscribe the message from redisMessage*/
     this.sub = this.dataService.getQuotes().subscribe(quote => {
+      const currentDate = new Date();
+      const currentDateTime = this.datePipe.transform(currentDate, 'yyyy-MM-dd HH:mm:ss')!;
       const parsedResponse = JSON.parse(quote);
-      this.Responsequotes.push(parsedResponse);
+      const updatedResponse = {
+        ...parsedResponse,   // Spread the existing properties of the response
+        packetTime: currentDateTime,  // Add current date-time field
+      };
 
-      if (this.isFilterApplied) {
-        this.UpdatefilteredResponsequotes;
-      }
-
-      this.cdr.detectChanges(); // This ensures the UI is updated immediately
-    });
+      this.Responsequotes.push(updatedResponse);
 
     if (this.Responsequotes.length > this.maxQueueSize) {
       this.Responsequotes.shift(); // Remove the first item when it reaches the maxQueueSize (FIFO)
-    }
+    } 
+
+
+    this.UpdateListViewInterval()      
+    });  
+    
   }
 
+  UpdateListViewInterval(): void {
+    
+    this.intervalId = setInterval(() => {
+      this.UpdatefilteredResponsequotes();
+    }, 1000); 
+
+     this.cdr.detectChanges(); // This ensures the UI is updated immediately   
+  }
+
+  clearInterval(): void { 
+    if (this.intervalId) { 
+      clearInterval(this.intervalId); 
+    } 
+  }
+  
   ngOnDestroy() {
     this.sub.unsubscribe();
-  }
+  } 
+  
 
   /*Filter algorithm*/
 
   applyFilter(): void {
 
     if (this.filterTagId == "") {
-      this.EmptyFilter = 'Please enter the TagId to filter.';
-      return;
-    }
+      this.WarningMsg = 'Please provide a Tag Id to apply the filter.';
+      return; 
+    } 
 
     this.isFilterApplied = true;     //flag to control whether filter status is clicked or not  
-    
-    this.FilterStatusString= "Filtering"
 
-    this.UpdatefilteredResponsequotes;
+    this.filterTags = this.filterTagId.split(',').map(tagId => tagId.trim().toLowerCase());  
 
-    this.cdr.detectChanges();
-  }
+    this.UpdatefilteredResponsequotes();
+   
+    this.cdr.detectChanges(); 
+}
 
-  //Dynamically checks the filter status and update the table
-  get UpdatefilteredResponsequotes() {
 
-    let filterTags: string[] = [];
+  UpdatefilteredResponsequotes() {  
 
-    if (this.isFilterApplied) {
-      let accumulatedFilteredResults: Quote[] = [];
+   let accumulatedFilteredResults: Quote[] = [];
+          
+   for (let i = 0; i < this.filterTags.length; i++) {
+     
+     const filterTag = this.filterTags[i];
 
-      filterTags = this.filterTagId.split(',').map(tagId => tagId.trim().toLowerCase());
+     if (filterTag != "") {
+       
+      const filteredResult = this.Responsequotes.filter(item => {
+       return String(item.tagId) === filterTag;
+       });
+       
+       accumulatedFilteredResults = [...accumulatedFilteredResults, ...filteredResult];//to add the newly added tag filteredResult to updated accumulatedFilteredResults array            
+       this.Filteredquotes = this.sortResults(accumulatedFilteredResults);
 
-      for (let i = 0; i < filterTags.length; i++) {
-
-        const filterTag = filterTags[i];
-
-        if (filterTag != "") {
-          const filteredResult = this.Responsequotes.filter(item => {
-            return String(item.tagId) === filterTag;
-          });
-
-          accumulatedFilteredResults = [...accumulatedFilteredResults, ...filteredResult];//to add the newly added tag filteredResult to updated accumulatedFilteredResults array            
-        }
-
+       if(this.isFilterApplied && this.Responsequotes.length > 0){
+        if (accumulatedFilteredResults.length === 0) {
+          this.WarningMsg = 'No results found for the provided Tag Id. Please verify and try again.';          
+        } 
       }
-
-      if (accumulatedFilteredResults.length === 0) {
-        this.EmptyFilter = 'TagId could not found'; // Display "not found" message
-      } else {
-        this.EmptyFilter = '';
-      }
-
-    this.Filteredquotes = this.sortResults(accumulatedFilteredResults);
-    return this.Filteredquotes;
-
-    }  
-    else{
-      return this.Responsequotes;
+     }  
     }
   }
 
@@ -150,32 +164,30 @@ export class AppComponent implements OnInit {
 
     if (event.keyCode === 8 || event.keyCode === 46 ) {   
       
-       this.UpdatefilteredResponsequotes;
+       //this.UpdatefilteredResponsequotes;
     } 
   } 
 
   @HostListener('document:keydown', ['$event'])  //to listen the enter event 
-  onKeyEnter_Filter(event: KeyboardEvent):void{  
-  //13 - enter key's keycode
-    if(event.keyCode === 13) 
-    {      
-      if(this.filterTagId != "")
-          this.applyFilter();
+  onKeyEnter_Filter(event: KeyboardEvent): void {
+    //13 - enter key's keycode
+    if (event.keyCode === 13) {
+      if (this.filterTagId != "")
+        this.applyFilter();
     }
   }
 
   clearFilter(): void {
     this.filterTagId = '';
-    this.isFilterApplied = false;    
-    this.FilterStatusString= "Filter"
-    this.UpdatefilteredResponsequotes
-    this.cdr.detectChanges();
+    this.isFilterApplied = false;   
+    this.cdr.detectChanges();     
   }
+  
+  CloseWarningMsg():void{  
 
-  closeMessageBox(): void {
-    this.EmptyFilter = ''
-    this.clearFilter();
-  }
+  this.clearFilter();
+  this.WarningMsg = ''
+}
 
   /*CSV*/
 
@@ -216,9 +228,9 @@ export class AppComponent implements OnInit {
 
   OnListViewClear(): void {
 
-  this.Filteredquotes = [];   
-  this.Responsequotes = [];     
-  this.cdr.detectChanges(); 
+    this.Filteredquotes = [];
+    this.Responsequotes = [];
+    this.cdr.detectChanges();
 
   }
 
