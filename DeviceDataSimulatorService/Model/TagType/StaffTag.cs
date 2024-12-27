@@ -16,6 +16,7 @@ namespace DeviceDataSimulatorService.Model.TagType
         public int wifiActiveReportRate { get; set; } = 0;
         public int bleActiveReportRate { get; set; } = 0;
         public int reloadConfigInterval { get; set; } = 0;
+        public DateTime ReceivedTime { get; set; } = DateTime.Now;
         public List<Locations> locations { get; set; } = new List<Locations>();
     }
 

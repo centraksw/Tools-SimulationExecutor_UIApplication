@@ -1,13 +1,12 @@
-﻿using DeviceDataSimulatorService.Model.TagType;
+﻿using DeviceDataSimulatorService.Model.Settings;
+using DeviceDataSimulatorService.Model.TagType;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using DeviceDataSimulatorService.Model.Settings;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace DeviceDataSimulatorService.Model.DevicePackets
 {
@@ -452,7 +451,6 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
             Buffer.BlockCopy(BitConverter.GetBytes((ushort)PktLen), 0, databuffer, offset, 2);
             offset += 2;
 
-
             return databuffer;
         }
 
@@ -491,7 +489,6 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
                         staffTag.wifiActiveReportRate = staffTagCsv[idx].wifiActiveReportRate;
                         staffTag.bleActiveReportRate = staffTagCsv[idx].bleActiveReportRate;
                         staffTag.reloadConfigInterval = staffTagCsv[idx].reloadConfigInterval;
-
 
                         Locations locations = new Locations();
 
