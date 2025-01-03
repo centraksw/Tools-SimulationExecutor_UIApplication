@@ -26,7 +26,7 @@ namespace DeviceDataSimulatorService.Model.Settings
 
         public static byte StaffTagHeader = 19;
 
-        public static int MaxBuffer = 1020 * 40;
+        public static int MaxBuffer = 1024 * 40;
 
         public static byte Header_Page_Info = 20;
 

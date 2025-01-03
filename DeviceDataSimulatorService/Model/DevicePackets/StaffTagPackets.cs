@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -14,9 +16,96 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
     {
         public static List<StaffTag> staffTags = null;
         public static byte TagPageIdx = 0;
-        public static byte[] PrepareStaffTagPagingData(List<StaffTag> staffTags)
+
+        
+            public static byte[] PrepareStaffTagPagingReqRes(List<StaffTag> staffTags, ref ushort offset)
         {
-            int offset = 0;
+            byte[] buf = new byte[40];
+            byte[] macId = { 0, 189, 59, 51, 254 };
+            int tmp = 0;
+            int retry = 0;
+            ushort[] addr = new ushort[2]; 
+            offset = 0; 
+            ushort totallen = 30;
+            Int32 NW_HDR_PAGE_RESPONSE_3X = 21;
+
+            Buffer.BlockCopy(BitConverter.GetBytes(totallen), 0, buf, offset, 2);
+            offset += 2;
+
+            buf[offset++] = Convert.ToByte(NW_HDR_PAGE_RESPONSE_3X);
+
+            Buffer.BlockCopy(BitConverter.GetBytes(totallen), 0, buf, offset, 2);
+            offset += 2;
+
+            Buffer.BlockCopy(BitConverter.GetBytes(TagDataValues.starId), 0, buf, offset, 2);
+            offset += 2;
+
+            buf[offset++] = 1;//rssi
+            buf[offset++] = 2;//Associated StarId
+            buf[offset++] = 0;//Associated StarId
+
+            string host = GetLocalIPAddress();
+            IPAddress ipAddress = IPAddress.Parse(host);
+            byte[] ipBytes = ipAddress.GetAddressBytes();
+            if (ipBytes.Length == 4)
+            {
+                Buffer.BlockCopy(ipBytes, 0, buf, offset, 4);
+                offset += 4;
+            }
+            else
+            {
+                return null;
+            }
+
+            Buffer.BlockCopy(BitConverter.GetBytes(tmp), 0, buf, offset, 4);
+            offset += 4;
+
+            Buffer.BlockCopy(macId, 0, buf, offset, 5);
+            offset += 5;
+
+            buf[offset++] = Convert.ToByte(TagDataValues.starId);
+           
+            byte Type = 2;
+            Type |= (byte)(0x1 << 7);
+            buf[offset++] = Type;  // StarType
+            buf[offset++] = 51; //Version
+
+            Buffer.BlockCopy(BitConverter.GetBytes(tmp), 0, buf, offset, 4);
+            offset += 4;
+
+            buf[offset++] = 12; //curSlot
+
+            buf[offset++] = DevicePacketUtils.CheckSum(buf, 2, offset - 1);
+
+            return buf;
+        }
+
+        static string GetLocalIPAddress()
+        {
+            string localIP = string.Empty;
+
+            // Get the host name of the machine
+            string hostName = Dns.GetHostName();
+
+            // Get the IP address list associated with the host
+            IPAddress[] addresses = Dns.GetHostAddresses(hostName);
+
+            foreach (var address in addresses)
+            {
+                // Check if the address is IPv4 (local IP)
+                if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    localIP = address.ToString();
+                    break;
+                }
+            }
+
+            return localIP;
+        }
+
+        public static byte[] PrepareStaffTagPagingData(List<StaffTag> staffTags, ref int offset)
+        {
+            offset = 0;
             int tagPktSize = 0;
             int totalPktSize = 0;
 
@@ -78,13 +167,14 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
 
                 totalPktSize = tagPktSize;
 
-                buf[offset] = DevicePacketUtils.CheckSum(buf, 2, totalPktSize - 1);
+                buf[offset++] = DevicePacketUtils.CheckSum(buf, 2, totalPktSize - 1);
+                offset++;
             }
 
             return buf;
         }
 
-        public static byte[] PrepareStaffTagLocationData(List<StaffTag> staffTags)
+        public static byte[] PrepareStaffTagLocationData(List<StaffTag> staffTags, ref ushort offset)
         {
             int StarId = 1;
 
@@ -111,7 +201,7 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
             byte Profile2 = 0;
             byte undefined = 1;
 
-            ushort offset = 0;
+            offset = 0;
             ushort EmOffset = 0;
             ushort CurRoomId = 0;
 
@@ -119,8 +209,8 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
             ushort RawHumidity = 0, RawTemp = 0;
             int Command = 0;
             string Str = "";
-            byte[] buf = new byte[1020 * 40];
-            byte[] Embuf = new byte[1020 * 40];
+            byte[] buf = new byte[SettingFields.MaxBuffer];
+            byte[] Embuf = new byte[SettingFields.MaxBuffer];
 
             TagData data = new TagData();
 
@@ -167,14 +257,15 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
 
             buf[offset++] = 0; //Reserved
 
-            buf[offset++] = 0xD; //PktLen-Reserved
+            buf[offset++] = 0xB; //PktLen-Reserved
 
             Int32 RF_HDR_LOCATION_INFO_3X_EX = 5;
             Int32 RF_TAG_IRID_PACKET = 5;
+            Int32 RF_TAG_MINIMAL_PACKET = 2;
 
-            buf[offset++] = Convert.ToByte((((RF_HDR_LOCATION_INFO_3X_EX & 0x7) << 5) | (RF_TAG_IRID_PACKET & 0xF)));  //SubHeader
+            buf[offset++] = Convert.ToByte((((RF_HDR_LOCATION_INFO_3X_EX & 0x7) << 5) | (RF_TAG_MINIMAL_PACKET & 0xF)));  //SubHeader
 
-            data.DeviceId = Convert.ToUInt32(TagDataValues.tagId) + TAG_BASE_ID_3X;
+            data.DeviceId = Convert.ToUInt32(TagDataValues.tagId) | TAG_BASE_ID_3X;
 
             Buffer.BlockCopy(BitConverter.GetBytes(data.DeviceId), 0, buf, offset, 4);
             offset += 4;
@@ -192,10 +283,10 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
             //if (settings.Alive) data.Status |= 0x8;
             buf[offset++] = data.Status;
 
-            CurRoomId = 1;
+            //CurRoomId = 1;
 
-            Buffer.BlockCopy(BitConverter.GetBytes(TagDataValues.roomId), 0, buf, offset, 2);
-            offset += 2;
+            //Buffer.BlockCopy(BitConverter.GetBytes(TagDataValues.roomId), 0, buf, offset, 2);
+            //offset += 2;
 
             buf[offset++] = (byte)2; // data.Rssi;
 
@@ -210,7 +301,8 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
 
             Buffer.BlockCopy(BitConverter.GetBytes(StarReportIndex), 0, buf, 5, 2);
 
-            buf[offset] = DevicePacketUtils.CheckSum(buf, 2, TotalPktSize - 1);
+            buf[offset++] = DevicePacketUtils.CheckSum(buf, 2, TotalPktSize - 1);
+
 
             return buf;
         }
@@ -375,7 +467,7 @@ namespace DeviceDataSimulatorService.Model.DevicePackets
             TagDataIdx++;
             TagDataIdx %= 16;
 
-            int RoomId = TagDataValues.roomId;
+            int RoomId = TagDataValues.wifiRoomId;
 
             value = (ushort)(RoomId | (1 << 12));
             Buffer.BlockCopy(BitConverter.GetBytes(value), 0, Vendorbuf, vendoroffset, 2);

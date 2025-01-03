@@ -13,9 +13,9 @@
             _client.Connect(ip, port);
         }
 
-        public static void SendData(byte[] buffer)
+        public static void SendData(byte[] buffer, int len)
         {
-            int size = _client.SendData(buffer);
+            int size = _client.SendData(buffer, len);
         }
 
         public static void Close()
