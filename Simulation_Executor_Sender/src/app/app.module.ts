@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MatSelectModule } from '@angular/material/select';
@@ -9,12 +10,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatDialogActions } from '@angular/material/dialog';
 import { HttpClient, HttpClientModule, HttpHandler } from '@angular/common/http';
-import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
     AppComponent
-    ],
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -28,7 +28,7 @@ import { DatePipe } from '@angular/common';
     HttpClientModule
   ],
   providers: [
-    provideClientHydration(),[DatePipe]
+    provideClientHydration()
   ],
   bootstrap: [AppComponent],
   
