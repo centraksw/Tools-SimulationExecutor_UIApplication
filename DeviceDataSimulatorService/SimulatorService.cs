@@ -23,6 +23,7 @@ namespace DeviceDataSimulatorService
         int pagingServerPort = 5050;
         string locationSeverIP = "";
         int locationServerPort = 3030;
+        int wifiLocationServerPort = 3031;
         string fileType = "";
         string fileData = "";
 
@@ -292,6 +293,7 @@ namespace DeviceDataSimulatorService
                                     string tagSendingData = JsonConvert.SerializeObject(sendingData);
                                     Thread.Sleep(TagDataValues.rfActiveReportRate * 1000);
 
+                                    SendPagingReqRes();
                                     SendPagingData(tagSendingData);
                                     SendLocationData(tagSendingData);
                                    
@@ -304,7 +306,7 @@ namespace DeviceDataSimulatorService
                                         tagType = TagDataValues.tagType,
                                         starId = TagDataValues.wifiStarId,
                                         rssi = TagDataValues.rssi,
-                                        roomId = TagDataValues.roomId,
+                                        roomId = TagDataValues.wifiRoomId,
                                         keys = TagDataValues.wifiKeys,
                                         campus = TagDataValues.campus,
                                         building = TagDataValues.building,
@@ -328,24 +330,39 @@ namespace DeviceDataSimulatorService
         }
         private void SendPagingData(string tagData)
         {
+            int offset = 0;
             PrepareJSONDATA(tagData);
-            byte[] buf = StaffTagPackets.PrepareStaffTagPagingData(StaffTagPackets.staffTags);
+            byte[] buf = StaffTagPackets.PrepareStaffTagPagingData(StaffTagPackets.staffTags, ref offset);
 
             Client.CreateTcpClient();
-            Client.Connect(pagingServerIP, pagingServerPort);
-            Client.SendData(buf);
+            Client.Connect(pagingServerIP, Convert.ToInt32(pagingServerPort));
+            Client.SendData(buf, offset);
             Client.Close();
         }
+
+        private void SendPagingReqRes()
+        {
+            ushort offset = 0;
+            byte[] buf = StaffTagPackets.PrepareStaffTagPagingReqRes(StaffTagPackets.staffTags, ref offset);
+
+            Client.CreateTcpClient();
+            Client.Connect(pagingServerIP, Convert.ToInt32(pagingServerPort));
+            Client.SendData(buf, offset);
+            Client.Close();
+        }
+
+        
 
         private void SendLocationData(string tagData)
         {
             PrepareJSONDATA(tagData);
+            ushort offset = 0;
 
-            byte[] buf = StaffTagPackets.PrepareStaffTagLocationData(StaffTagPackets.staffTags);
+            byte[] buf = StaffTagPackets.PrepareStaffTagLocationData(StaffTagPackets.staffTags, ref offset);
 
             Client.CreateTcpClient();
-            Client.Connect(locationSeverIP, locationServerPort);
-            Client.SendData(buf);
+            Client.Connect(locationSeverIP, Convert.ToInt32(locationServerPort));
+            Client.SendData(buf, offset);
             Client.Close();
         }
 
@@ -356,8 +373,8 @@ namespace DeviceDataSimulatorService
             byte[] buf = StaffTagPackets.PrepareWifiTagInfoEx(StaffTagPackets.staffTags, TagId);
 
             Client.CreateTcpClient();
-            Client.Connect(locationSeverIP, Convert.ToInt32(3031));
-            Client.SendData(buf);
+            Client.Connect(locationSeverIP, Convert.ToInt32(wifiLocationServerPort));
+            Client.SendData(buf, buf.Length);
             Client.Close();
         }
 

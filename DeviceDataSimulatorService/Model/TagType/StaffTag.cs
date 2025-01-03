@@ -175,6 +175,7 @@ namespace DeviceDataSimulatorService.Model.TagType
 
         public static int wifiStarId { get; set; } = 0;
         public static byte wifiKeys { get; set; } = 0;
+        public static int wifiRoomId { get; set; } = 0;
 
     }
 

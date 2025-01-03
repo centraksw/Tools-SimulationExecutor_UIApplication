@@ -32,14 +32,14 @@ namespace DeviceDataSimulatorService.Transport.TCPClient
             }
         }
 
-        public int SendData(byte[] buffer)
+        public int SendData(byte[] buffer, int len)
         {
             lock (_tcpLock)
             {
                 if (_tcpClient.Client.Connected)
                 {
                     NetworkStream stream = _tcpClient.GetStream();
-                    stream.Write(buffer, 0, buffer.Length);
+                    stream.Write(buffer, 0, len);
                 }
             }
 
